@@ -35,6 +35,8 @@ services:
       POSTGRES_DB: simples_dev
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - /data/postgresql:/var/lib/postgresql
+      - /data/postgresql/data:/var/lib/postgresql/data
     networks:
       - monorepo_net
   pgadmin:
@@ -48,24 +50,25 @@ services:
       - "5050:80"
     networks:
       - monorepo_net
-    logging:
-        driver: always
     volumes:
       - pgadmin_data:/var/lib/pgadmin
 
-  # simples-api:
+
+  # simples_api:
   #   build:
-  #     context: ./
-  #     dockerfile: apis/simples-api/Dockerfile.simples-api
+  #     context: .
+  #     dockerfile: apis/api-tests/api-testes.Dockerfile
   #     target: development
   #   env_file: .env.development
   #   command: nx serve simples-api
   #   depends_on:
   #     - redis
+  #     - postgres
+  #     - pgadmin
   #   environment:
   #     - REDIS_URL="redis://host.docker.internal:6379"
   #   ports:
-  #     - 7001:7001
+  #     - 3001:3001
   #   extra_hosts:
   #       - "host.docker.internal:host-gateway"
   #       - localhost:192.168.100.231
@@ -74,15 +77,33 @@ services:
   #   restart: on-failure
   #   volumes:
   #     - .:/app
-  #     - simples-api_vol:/usr/src/simples-api/
+  #     - simples_api_vol:/usr/src/simples_api/
   #     - node_modules:/usr/src/node_modules/
   #   networks:
   #     - monorepo_net
 
 
+  nest-projectcqrs:
+    build:
+      context: .
+      dockerfile: apis/api-tests/api-testes.Dockerfile
+    command: nx serve api-tests
+    depends_on:
+      - postgres
+      - pgadmin
+    ports:
+      - '3000:3000'
+    environment:
+      - APP_PORT=3000
+    volumes:
+      - .:/app
+      - simples_api_vol:/usr/src/simples_api/
+      - node_modules:/usr/src/node_modules/
+    networks:
+      - monorepo_net
 
 volumes:
-  simples-api_vol:
+  simples_api_vol:
   pgadmin_data:
   postgres_data:
   redis_data:

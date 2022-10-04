@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { configuration } from './configuration';
@@ -25,9 +25,9 @@ const ENV = process.env.NODE_ENV;
   exports: [TypeOrmModule],
 })
 export class ApiCoreModule {
-  constructor() {
-    console.log('AMBIENTE', ENV, !ENV ? '.env' : `.env.${ENV}`);
-    console.log('ENV_FILE', process.env.ENV_FILE);
-    console.log(process.env);
+  constructor(private readonly configService: ConfigService) {
+    const dbConfig = this.configService.get('database');
+
+    console.log(dbConfig);
   }
 }

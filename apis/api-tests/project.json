@@ -1,5 +1,5 @@
 {
-  "name": "..-apis-api-tests",
+  "name": "api-tests",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "apis/api-tests/src",
   "projectType": "application",
@@ -32,11 +32,11 @@
     "serve": {
       "executor": "@nrwl/js:node",
       "options": {
-        "buildTarget": "..-apis-api-tests:build"
+        "buildTarget": "api-tests:build"
       },
       "configurations": {
         "production": {
-          "buildTarget": "..-apis-api-tests:build:production"
+          "buildTarget": "api-tests:build:production"
         }
       }
     },

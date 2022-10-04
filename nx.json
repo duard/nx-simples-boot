@@ -36,5 +36,5 @@
     ],
     "sharedGlobals": []
   },
-  "defaultProject": "..-apis-api-tests"
+  "defaultProject": "api-tests"
 }
