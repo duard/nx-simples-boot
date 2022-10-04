@@ -87,14 +87,19 @@ services:
     build:
       context: .
       dockerfile: apis/api-tests/api-testes.Dockerfile
+      target: development
+    env_file: .env.development
     command: nx serve api-tests
     depends_on:
+      - redis
       - postgres
       - pgadmin
+
     ports:
       - '3000:3000'
     environment:
       - APP_PORT=3000
+    restart: on-failure
     volumes:
       - .:/app
       - simples_api_vol:/usr/src/simples_api/
