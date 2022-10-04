@@ -1,0 +1,93 @@
+version: '3.8'
+services:
+  redis:
+    image: redis:latest
+    ports:
+      - 6379:6379
+    extra_hosts:
+        - "host.docker.internal:host-gateway"
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis_data:/data
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    environment:
+      - REDIS_HOSTS=local:redis:6379
+      - HTTP_USER=root
+      - HTTP_PASSWORD=teste123
+    ports:
+      - 8083:8081
+    extra_hosts:
+        - "host.docker.internal:host-gateway"
+    depends_on:
+      - redis
+  postgres:
+    container_name: pg_container
+    image: postgres:latest
+    restart: always
+    extra_hosts:
+        - "host.docker.internal:host-gateway"
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: simples_dev
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - monorepo_net
+  pgadmin:
+    container_name: pgadmin4_container
+    image: dpage/pgadmin4
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: root
+    ports:
+      - "5050:80"
+    networks:
+      - monorepo_net
+    logging:
+        driver: always
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+
+  # simples-api:
+  #   build:
+  #     context: ./
+  #     dockerfile: apis/simples-api/Dockerfile.simples-api
+  #     target: development
+  #   env_file: .env.development
+  #   command: nx serve simples-api
+  #   depends_on:
+  #     - redis
+  #   environment:
+  #     - REDIS_URL="redis://host.docker.internal:6379"
+  #   ports:
+  #     - 7001:7001
+  #   extra_hosts:
+  #       - "host.docker.internal:host-gateway"
+  #       - localhost:192.168.100.231
+  #   links:
+  #     - redis
+  #   restart: on-failure
+  #   volumes:
+  #     - .:/app
+  #     - simples-api_vol:/usr/src/simples-api/
+  #     - node_modules:/usr/src/node_modules/
+  #   networks:
+  #     - monorepo_net
+
+
+
+volumes:
+  simples-api_vol:
+  pgadmin_data:
+  postgres_data:
+  redis_data:
+  node_modules:
+
+networks:
+  monorepo_net:
+    driver: bridge
