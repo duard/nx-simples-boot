@@ -54,36 +54,7 @@ services:
       - pgadmin_data:/var/lib/pgadmin
 
 
-  # simples_api:
-  #   build:
-  #     context: .
-  #     dockerfile: apis/api-tests/api-testes.Dockerfile
-  #     target: development
-  #   env_file: .env.development
-  #   command: nx serve simples-api
-  #   depends_on:
-  #     - redis
-  #     - postgres
-  #     - pgadmin
-  #   environment:
-  #     - REDIS_URL="redis://host.docker.internal:6379"
-  #   ports:
-  #     - 3001:3001
-  #   extra_hosts:
-  #       - "host.docker.internal:host-gateway"
-  #       - localhost:192.168.100.231
-  #   links:
-  #     - redis
-  #   restart: on-failure
-  #   volumes:
-  #     - .:/app
-  #     - simples_api_vol:/usr/src/simples_api/
-  #     - node_modules:/usr/src/node_modules/
-  #   networks:
-  #     - monorepo_net
-
-
-  nest-projectcqrs:
+  simples_api:
     build:
       context: .
       dockerfile: apis/api-tests/api-testes.Dockerfile
@@ -94,11 +65,15 @@ services:
       - redis
       - postgres
       - pgadmin
-
-    ports:
-      - '3000:3000'
     environment:
-      - APP_PORT=3000
+      - REDIS_URL="redis://host.docker.internal:6379"
+    ports:
+      - 3000:3000
+    extra_hosts:
+        - "host.docker.internal:host-gateway"
+        - localhost:192.168.100.231
+    links:
+      - redis
     restart: on-failure
     volumes:
       - .:/app
@@ -106,6 +81,31 @@ services:
       - node_modules:/usr/src/node_modules/
     networks:
       - monorepo_net
+
+
+  # nest-projectcqrs:
+  #   build:
+  #     context: .
+  #     dockerfile: apis/api-tests/api-testes.Dockerfile
+  #     target: development
+  #   env_file: .env.development
+  #   command: nx serve api-tests
+  #   depends_on:
+  #     - redis
+  #     - postgres
+  #     - pgadmin
+
+  #   ports:
+  #     - '3000:3000'
+  #   environment:
+  #     - APP_PORT=3000
+  #   restart: on-failure
+  #   volumes:
+  #     - .:/app
+  #     - simples_api_vol:/usr/src/simples_api/
+  #     - node_modules:/usr/src/node_modules/
+  #   networks:
+  #     - monorepo_net
 
 volumes:
   simples_api_vol:
