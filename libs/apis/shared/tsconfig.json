@@ -4,6 +4,7 @@
     "module": "commonjs"
   },
   "files": [],
+
   "include": ["**/*.ts"],
   "references": [
     {

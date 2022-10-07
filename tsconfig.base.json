@@ -1,6 +1,7 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
+    "composite": false,
     "rootDir": ".",
     "sourceMap": true,
     "declaration": false,
@@ -15,7 +16,9 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@nx-simples-boot/apis/core": ["libs/apis/core/src/index.ts"]
+      "@nx-simples-boot/apis/core": ["libs/apis/core/src/index.ts"],
+      "@nx-simples-boot/apis/cruds": ["libs/apis/cruds/src/index.ts"],
+      "@nx-simples-boot/apis/shared": ["libs/apis/shared/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
