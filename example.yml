@@ -1,0 +1,119 @@
+version: '3.8'
+services:
+  redis:
+    image: redis:latest
+    ports:
+      - 6379:6379
+    extra_hosts:
+        - "host.docker.internal:host-gateway"
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis_data:/data
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    environment:
+      - REDIS_HOSTS=local:redis:6379
+      - HTTP_USER=root
+      - HTTP_PASSWORD=teste123
+    ports:
+      - 8083:8081
+    extra_hosts:
+        - "host.docker.internal:host-gateway"
+    depends_on:
+      - redis
+  postgres:
+    container_name: pg_container
+    image: postgres:latest
+    restart: always
+    extra_hosts:
+        - "host.docker.internal:host-gateway"
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: simples_dev
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - /data/postgresql:/var/lib/postgresql
+      - /data/postgresql/data:/var/lib/postgresql/data
+    networks:
+      - monorepo_net
+  pgadmin:
+    container_name: pgadmin4_container
+    image: dpage/pgadmin4
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: root
+    ports:
+      - "5050:80"
+    networks:
+      - monorepo_net
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+
+
+  simples_api:
+    build:
+      context: .
+      dockerfile: apis/api-tests/api-testes.Dockerfile
+      target: development
+    env_file: .env.development
+    command: nx serve api-tests
+    depends_on:
+      - redis
+      - postgres
+      - pgadmin
+    environment:
+      - REDIS_URL="redis://host.docker.internal:6379"
+    ports:
+      - 3000:3000
+    extra_hosts:
+        - "host.docker.internal:host-gateway"
+        - localhost:192.168.100.231
+    links:
+      - redis
+    restart: on-failure
+    volumes:
+      - .:/app
+      - simples_api_vol:/usr/src/simples_api/
+      - node_modules:/usr/src/node_modules/
+    networks:
+      - monorepo_net
+
+
+  # nest-projectcqrs:
+  #   build:
+  #     context: .
+  #     dockerfile: apis/api-tests/api-testes.Dockerfile
+  #     target: development
+  #   env_file: .env.development
+  #   command: nx serve api-tests
+  #   depends_on:
+  #     - redis
+  #     - postgres
+  #     - pgadmin
+
+  #   ports:
+  #     - '3000:3000'
+  #   environment:
+  #     - APP_PORT=3000
+  #   restart: on-failure
+  #   volumes:
+  #     - .:/app
+  #     - simples_api_vol:/usr/src/simples_api/
+  #     - node_modules:/usr/src/node_modules/
+  #   networks:
+  #     - monorepo_net
+
+volumes:
+  simples_api_vol:
+  pgadmin_data:
+  postgres_data:
+  redis_data:
+  node_modules:
+
+networks:
+  monorepo_net:
+    driver: bridge
