@@ -21,10 +21,10 @@ services:
       - "5050:80"
     depends_on:
       - postgres
-    networks:
-      - monorepo_net
     volumes:
       - pgadmin_data:/var/lib/pgadmin/data
+    networks:
+      - monorepo_net
 
   simples_api:
     build:
@@ -52,11 +52,10 @@ services:
       - monorepo_net
 
 volumes:
-  simples_api_vol:
-  redis_data:
-  node_modules:
   pgadmin_data:
   postgres_data:
+  simples_api_vol:
+  node_modules:
 
 networks:
   monorepo_net:
