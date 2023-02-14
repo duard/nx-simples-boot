@@ -2,23 +2,39 @@ version: '3.8'
 services:
   postgres:
     image: postgres
+    logging:
+      driver: none
     environment:
-      POSTGRES_USERNAME: "postgres"
-      POSTGRES_PASSWORD: "postgres"
+      POSTGRES_USERNAME: 'postgres'
+      POSTGRES_PASSWORD: 'postgres'
     ports:
-      - "5432:5432"
+      - '5432:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - monorepo_net
 
+  mongodb:
+    image: mongo
+    ports:
+      - 27017:27017
+    command: mongod --quiet --logpath /dev/null
+    volumes:
+      - mongodb_data:/var/lib/mongodb/data
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    networks:
+      - monorepo_net
+
   pgadmin:
     image: dpage/pgadmin4
+    logging:
+      driver: 'syslog'
     environment:
-      PGADMIN_DEFAULT_EMAIL: "admin@admin.com"
-      PGADMIN_DEFAULT_PASSWORD: "root"
+      PGADMIN_DEFAULT_EMAIL: 'admin@admin.com'
+      PGADMIN_DEFAULT_PASSWORD: 'root'
     ports:
-      - "5050:80"
+      - '5050:80'
     depends_on:
       - postgres
     volumes:
@@ -41,8 +57,8 @@ services:
     ports:
       - 3000:3000
     extra_hosts:
-        - "host.docker.internal:host-gateway"
-        - localhost:192.168.100.231
+      - 'host.docker.internal:host-gateway'
+      - localhost:192.168.100.231
     restart: on-failure
     volumes:
       - .:/app
@@ -53,6 +69,7 @@ services:
 
 volumes:
   pgadmin_data:
+  mongodb_data:
   postgres_data:
   simples_api_vol:
   node_modules:
